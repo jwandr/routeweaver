@@ -10,7 +10,7 @@
 .route-controls{display:flex;flex-direction:column;gap:3px;margin-left:2px}.route-controls button{padding:1px 5px;line-height:1.25;font-size:11px;border-radius:5px}.route-list{display:grid;gap:8px}.route-item{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:9px;padding:10px;cursor:pointer}.route-item.active{border:2px solid var(--accent);background:linear-gradient(100deg,#e4efff 0%,#f4f8ff 100%);box-shadow:0 0 0 3px #1769e018}.route-item input{margin-top:4px}.route-item .route-name{font-weight:700}.route-item .route-sub{font-size:12px;color:var(--muted);margin-top:2px}.route-cost{margin-left:auto;text-align:right;font-weight:750;white-space:nowrap}.route-cost small{display:block;font-weight:400;color:var(--muted)}
 .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}.kpi{background:#f6faff;border:1px solid var(--line);border-radius:9px;padding:10px}.kpi .label{font-size:11px;color:var(--muted)}.kpi .value{font-size:19px;font-weight:750;margin-top:2px;overflow-wrap:anywhere}.kpi .sub{font-size:11px;color:var(--muted)}
 .timeline-wrap{overflow-x:auto;position:relative}.timeline{min-width:820px;position:relative}.days{display:grid;grid-auto-columns:minmax(160px,1fr);grid-auto-flow:column;border-bottom:1px solid var(--line);background:#edf5ff}.dayhead{padding:11px 12px;border-right:1px solid var(--line);min-height:64px}.dayhead strong{display:block;font-size:12px}.dayhead span{font-size:11px;color:var(--muted)}.graph{position:relative;display:grid;grid-auto-columns:minmax(160px,1fr);grid-auto-flow:column;min-height:250px;align-items:stretch}.daylane{padding:13px 9px 18px;border-right:1px solid #e3ecf7;display:flex;flex-direction:column;gap:12px;min-width:0;z-index:1}.flight-card{position:relative;border:1px solid #cfd8df;border-radius:10px;background:#fff;padding:10px;box-shadow:0 2px 6px #2030400a;cursor:pointer;z-index:2;min-width:0}.flight-card:hover{border-color:#8da5b8}.flight-card>.row{padding-right:25px}.cabin-mark{position:absolute;top:7px;right:7px;width:19px;height:19px;display:grid;place-items:center;border-radius:5px;font-size:10px;font-weight:850;line-height:1;border:1px solid transparent;z-index:3}.cabin-mark.economy{background:#e8f5ff;color:#1769a6;border-color:#c5e5fb}.cabin-mark.business{background:#f0e9ff;color:#6840ad;border-color:#d9c9fb}.lock-mark{position:absolute;top:7px;right:30px;width:19px;height:19px;display:grid;place-items:center;font-size:13px;line-height:1;z-index:3;color:#5b6470;background:#f1f4f7;border:1px solid #dce3e9;border-radius:5px}.flight-card.active-route{border:2px solid var(--accent);background:linear-gradient(145deg,#e4efff 0%,#f7faff 100%);box-shadow:0 0 0 3px #1769e025,0 5px 14px #1769e012; transform:translateY(-1px)}.flight-card.unused{opacity:.72}.flight-card .code{font-weight:800;font-size:14px;letter-spacing:.2px}.flight-card .arrow{color:var(--muted);padding:0 4px}.flight-card .flight-code-line{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:2px;min-height:16px}.flight-card .airline-logo{width:20px;height:16px;object-fit:contain;display:inline-block;flex:0 0 20px;vertical-align:middle}.flight-card .airline-logo[hidden]{display:none}.flight-card .time{font-size:11px;color:var(--muted);margin-top:4px}.flight-card .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}.flight-card .price{font-size:12px;font-weight:750;margin-top:7px}.flight-card .cardactions{display:flex;gap:5px;justify-content:flex-end;margin-top:7px}.flight-card .cardactions button{font-size:11px;padding:3px 6px}.connectors{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}.connector{fill:none;stroke:#a9b7c3;stroke-width:2;opacity:.65}.connector.highlight{stroke:var(--accent);stroke-width:4.5;opacity:1;filter:drop-shadow(0 1px 1px #1769e033)}.connector.preferred{stroke:var(--green);stroke-width:3.5;opacity:1}.graph-legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 15px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.legendline{display:inline-block;width:22px;border-top:3px solid var(--accent);vertical-align:middle;margin-right:5px}.legendline.green{border-color:var(--green)}.legendline.grey{border-color:#a9b7c3}
-.warning{padding:10px 11px;border-radius:8px;background:var(--amber-soft);color:#765200;font-size:12px;margin-top:8px}.success{padding:10px 11px;border-radius:8px;background:var(--green-soft);color:#205b48;font-size:12px;margin-top:8px}.error{padding:10px 11px;border-radius:8px;background:var(--red-soft);color:var(--red);font-size:12px;margin-top:8px}.flight-list{display:grid;gap:8px}.flight-row{border:1px solid var(--line);border-radius:9px;padding:10px;display:flex;align-items:center;gap:10px}.flight-row .flightmain{min-width:0;flex:1}.flight-row strong{font-size:13px}.flight-row .detail{font-size:11px;color:var(--muted)}.flight-row .rowcost{font-weight:750;white-space:nowrap}.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:650;color:#465462}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5dd;border-radius:7px;padding:8px 9px;background:#fff;color:var(--ink)}.field textarea{min-height:65px;resize:vertical}.field .hint{font-size:11px;color:var(--muted)}.checkrow{display:flex;gap:8px;align-items:center;font-size:12px}.checkrow input{width:auto}.modal-backdrop{position:fixed;inset:0;background:#17212b77;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-backdrop.open{display:flex}.modal{background:#fff;border-radius:13px;width:min(680px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px #0003}.modalhead,.modalfoot{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.modalhead h2{font-size:17px;margin:0}.modalbody{padding:18px}.modalfoot{border-top:1px solid var(--line);border-bottom:0;justify-content:flex-end}.sequence{display:grid;gap:6px;margin-top:8px}.sequence-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:8px}.sequence-item .seqtitle{flex:1;font-size:12px}.sequence-item button{padding:3px 7px}.pickrow{display:flex;gap:8px;align-items:center}.pickrow select{flex:1}.route-detail{display:grid;gap:10px}.route-step{display:flex;gap:9px;align-items:flex-start}.stepnum{width:23px;height:23px;flex:0 0 23px;display:grid;place-items:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:750;font-size:11px}.route-step strong{font-size:12px}.route-step .sub{font-size:11px;color:var(--muted)}.route-total{border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between;font-weight:750}.footer-note{font-size:11px;color:var(--muted);padding:12px 2px}.hidden{display:none!important}
+.warning{padding:10px 11px;border-radius:8px;background:var(--amber-soft);color:#765200;font-size:12px;margin-top:8px}.success{padding:10px 11px;border-radius:8px;background:var(--green-soft);color:#205b48;font-size:12px;margin-top:8px}.error{padding:10px 11px;border-radius:8px;background:var(--red-soft);color:var(--red);font-size:12px;margin-top:8px}.flight-list{display:grid;gap:8px}.flight-row{border:1px solid var(--line);border-radius:9px;padding:10px;display:flex;align-items:center;gap:10px}.flight-row .flightmain{min-width:0;flex:1}.flight-row strong{font-size:13px}.flight-row .detail{font-size:11px;color:var(--muted)}.flight-row .rowcost{font-weight:750;white-space:nowrap}.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:650;color:#465462}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5dd;border-radius:7px;padding:8px 9px;background:#fff;color:var(--ink)}.field textarea{min-height:65px;resize:vertical}.field .hint{font-size:11px;color:var(--muted)}.checkrow{display:flex;gap:8px;align-items:center;font-size:12px}.checkrow input{width:auto}.modal-backdrop{position:fixed;inset:0;background:#17212b77;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-backdrop.open{display:flex}.modal{background:#fff;border-radius:13px;width:min(680px,100%);max-height:90vh;overflow:auto;box-shadow:0 20px 60px #0003}.modalhead,.modalfoot{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.modalhead h2{font-size:17px;margin:0}.modalbody{padding:18px}.modalfoot{border-top:1px solid var(--line);border-bottom:0;justify-content:flex-end}.sequence{display:grid;gap:6px;margin-top:8px}.sequence-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:8px}.sequence-item .seqtitle{flex:1;font-size:12px}.sequence-item button{padding:3px 7px}.pickrow{display:flex;gap:8px;align-items:center}.pickrow select{flex:1}.route-detail{display:grid;gap:10px}.route-step{display:flex;gap:9px;align-items:flex-start}.stepnum{width:23px;height:23px;flex:0 0 23px;display:grid;place-items:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:750;font-size:11px}.route-step strong{font-size:12px}.route-step .sub{font-size:11px;color:var(--muted)}.route-total{border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between;font-weight:750}.footer-note{font-size:11px;color:var(--muted);padding:12px 2px}.cloud-panel{margin-bottom:16px}.cloud-body{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.cloud-login{gap:8px}.cloud-login label{font-size:12px;font-weight:700;color:var(--muted)}.cloud-login input{width:min(280px,55vw);border:1px solid #cbd5dd;border-radius:7px;padding:8px 9px;background:#fff;color:var(--ink)}.cloud-actions{justify-content:flex-end}.cloud-panel .panelhead p{max-width:850px}.hidden{display:none!important}
 @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar .panel:first-child{grid-column:1/-1}}@media(max-width:650px){.app{padding:12px}.topbar{display:block}.toolbar{justify-content:flex-start;margin-top:14px}.trip-toolbar select{flex:1;min-width:140px;max-width:100%}.trip-flow-actions{justify-content:flex-start}.sidebar{display:grid;grid-template-columns:1fr}.sidebar .panel:first-child{grid-column:auto}.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi .value{font-size:16px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.panelhead{align-items:flex-start}.brand h1{font-size:23px}}
 @media print{body{background:#fff}.app{max-width:none;padding:0}.toolbar,.cardactions,.panelhead button,.sidebar .panel:not(:first-child),.footer-note{display:none!important}.layout{display:block}.panel{box-shadow:none;break-inside:avoid;margin-bottom:12px}.timeline-wrap{overflow:visible}.timeline{min-width:0}.days,.graph{grid-auto-columns:minmax(100px,1fr)}.flight-card{break-inside:avoid}.sidebar{display:block}.panel{border-color:#bbb}}
 </style>
@@ -21,6 +21,10 @@
     <div class="brand"><h1>RouteWeaver</h1></div>
     <div class="toolbar trip-toolbar" aria-label="Trip controls"><label for="tripSelect">Current trip</label><select id="tripSelect" aria-label="Current trip"></select><button id="addTripBtn">＋ New Trip</button><button id="editTripBtn">Edit Trip</button><button id="exportBtn">Export JSON</button><button id="importBtn">Import JSON</button><input id="importFile" type="file" accept="application/json,.json" class="hidden"></div>
   </header>
+  <section class="panel cloud-panel" aria-labelledby="cloudTitle">
+    <div class="panelhead"><div><h2 id="cloudTitle">Cloud sync</h2><p id="cloudStatus" role="status" aria-live="polite">Checking Supabase configuration…</p></div><div class="row cloud-actions"><button id="cloudRefreshBtn" class="small" disabled>Refresh cloud</button><button id="cloudSignOutBtn" class="small hidden">Sign out</button></div></div>
+    <div class="panelbody cloud-body"><div class="row cloud-login"><label for="cloudEmail">Email</label><input id="cloudEmail" type="email" autocomplete="email" placeholder="you@example.com"><button id="cloudSignInBtn" class="small primary">Send sign-in link</button></div><p class="tiny muted" id="cloudHelp">Sign in with your email to enable cloud sync. Your local data remains available on this device.</p></div>
+  </section>
   <div class="layout">
     <main class="maincol">
       <section class="panel">
@@ -39,7 +43,7 @@
       <section class="panel"><div class="panelhead"><div><h2>Planning notes</h2></div></div><div class="panelbody tiny muted">This is a planning aid, not a live flight search. Check actual schedules, standby rules, terminal changes, visa requirements and minimum connection times with the relevant airlines. Route feasibility warnings use the times and minimum connection buffer you enter.</div></section>
     </aside>
   </div>
-  <div class="footer-note">Trips are saved in this browser on this device. Export JSON backs up all trips; Copy Trip JSON copies only the current trip.</div>
+  <div class="footer-note">Trips are saved in this browser on this device. Cloud sync is optional; JSON export remains available for backups. Copy Trip JSON copies only the current trip.</div>
 </div>
 
 <div class="modal-backdrop" id="tripEditModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="tripEditTitle"><div class="modalhead"><h2 id="tripEditTitle">Edit trip</h2><button type="button" data-close="tripEditModal" aria-label="Close">✕</button></div><form id="tripEditForm"><div class="modalbody"><div class="field"><label for="tripNameInput">Trip name</label><input id="tripNameInput" required maxlength="120" placeholder="e.g. Return from Kigali"></div><p class="tiny muted" style="margin:12px 0 0">Deleting a trip removes all its flights and routes from this browser. Export a backup first if you may need them later.</p><p id="lastTripWarning" class="warning hidden">You can't delete the only remaining trip. Create another trip first if you want to remove this one.</p></div><div class="modalfoot"><button type="button" class="danger" id="deleteTripFromEditorBtn">Delete Trip</button><span class="spacer"></span><button type="button" data-close="tripEditModal">Cancel</button><button type="submit" class="primary">Save Name</button></div></form></div></div>
@@ -64,6 +68,8 @@
 
 <div class="modal-backdrop" id="routeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="routeModalTitle"><div class="modalhead"><h2 id="routeModalTitle">Add route</h2><button data-close="routeModal" aria-label="Close">✕</button></div><form id="routeForm"><div class="modalbody"><input type="hidden" id="routeId"><div class="formgrid"><div class="field full"><label for="routeName">Route name</label><input id="routeName" required placeholder="Preferred: standby via Doha"></div><div class="field full"><label for="routeNotes">Notes</label><textarea id="routeNotes" placeholder="Assumptions, fallback details, or what-if notes…"></textarea></div><div class="field full"><label class="checkrow"><input type="checkbox" id="routePreferred"> Mark as preferred route</label></div><div class="field full"><label class="checkrow"><input type="checkbox" id="routeUnavailable"> Treat this route as a what-if / unavailable scenario</label></div><div class="field full"><label for="flightPicker">Add a flight to this route (in travel order)</label><div class="pickrow"><select id="flightPicker"></select><button type="button" id="addToSequenceBtn">Add flight</button></div><div class="hint">Add flights in chronological travel order. A flight can belong to any number of routes, but exists only once in the planner.</div><div id="routeSequence" class="sequence"></div><div id="sequenceEmpty" class="tiny muted" style="margin-top:8px">No flights in this route yet.</div></div></div></div><div class="modalfoot"><button type="button" class="danger" id="deleteRouteBtn">Delete route</button><span class="spacer"></span><button type="button" data-close="routeModal">Cancel</button><button type="submit" class="primary">Save route</button></div></form></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <script>
 (() => {
 'use strict';
@@ -79,6 +85,16 @@ const fmtStamp=s=>`${fmtDate(s)} · ${fmtTime(s)}`;
 const fmtCardTimes=(departAt,arriveAt)=>{const dep=String(departAt||'').slice(0,10),arr=String(arriveAt||'').slice(0,10);let offset=0;if(/^\d{4}-\d{2}-\d{2}$/.test(dep)&&/^\d{4}-\d{2}-\d{2}$/.test(arr)){offset=Math.round((Date.parse(arr+'T00:00:00Z')-Date.parse(dep+'T00:00:00Z'))/86400000)}return `${fmtTime(departAt)} · ${fmtTime(arriveAt)}${offset>0?' +'+offset:''}`};
 const localInputDate=d=>{const date=new Date(d.getTime()-d.getTimezoneOffset()*60000);return date.toISOString().slice(0,16)};
 let state;
+let supabaseClient = null;
+let cloudUser = null;
+let authUserId = null;
+let cloudSyncEnabled = false;
+let cloudBusy = false;
+let suppressCloudSchedule = false;
+let cloudMeta = new Map();       // trip id -> { updated_at, canonical }
+let cloudConflicts = new Set();  // trip IDs changed remotely since last sync
+let cloudTimer = null;
+const BACKUP_PREFIX = STORE_KEY + '-backup-';
 function demoState(){
  const flights=[
   {id:'f_per_doh_early',origin:'DOH',destination:'ZNZ',departAt:'2027-01-29T02:05',arriveAt:'2027-01-29T19:30',flightNumber:'',cabinClass:'economy',type:'standby',cost:680,buffer:120,availability:'planned',notes:'Earlier departure fallback; example cost only.',locked:false},
@@ -114,14 +130,14 @@ function normalize(s){
  return {...plan,activeTripId:id,trips:[trip]};
 }
 function snapshotActiveTrip(){if(!state?.trips||!state.activeTripId)return;const i=state.trips.findIndex(t=>t.id===state.activeTripId);if(i<0)return;state.trips[i]={...state.trips[i],flights:state.flights,routes:state.routes,selectedRoute:state.selectedRoute,nextMinBuffer:state.nextMinBuffer};}
-function save(){try{snapshotActiveTrip();localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){console.warn('Could not save locally',e)}}
+function save(){try{snapshotActiveTrip();localStorage.setItem(STORE_KEY,JSON.stringify(state));if(cloudSyncEnabled&&!suppressCloudSchedule)scheduleCloudSync();}catch(e){console.warn('Could not save locally',e)}}
 function load(){try{const raw=localStorage.getItem(STORE_KEY);if(raw)return normalize(JSON.parse(raw));}catch(e){console.warn('Could not load saved plan',e)}return demoState()}
 function renderTrips(){const sel=$('tripSelect');sel.innerHTML=(state.trips||[]).map(t=>`<option value="${escapeHtml(t.id)}" ${t.id===state.activeTripId?'selected':''}>${escapeHtml(t.name)}</option>`).join('');$('editTripBtn').disabled=!(state.trips||[]).length;}
 function switchTrip(id){if(!state.trips.some(t=>t.id===id)||id===state.activeTripId)return;save();const t=state.trips.find(x=>x.id===id);const plan=normalizePlan(t);state={...state,...plan,activeTripId:id,trips:state.trips};save();render();}
 function addTrip(){const name=prompt('Name this trip (e.g. Return from Kigali, ATW1080 — Europe):');if(!name||!name.trim())return;snapshotActiveTrip();const id=uid('trip');const plan={flights:[],routes:[],selectedRoute:'',nextMinBuffer:120};const t={id,name:name.trim(),...plan};state.trips.push(t);state={...state,...plan,activeTripId:id,trips:state.trips};save();render();}
 function openTripEditor(){const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;$('tripNameInput').value=t.name;$('deleteTripFromEditorBtn').disabled=state.trips.length<=1;$('lastTripWarning').classList.toggle('hidden',state.trips.length>1);$('tripEditModal').classList.add('open');}
 function renameTripFromEditor(){const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;const name=$('tripNameInput').value.trim();if(!name){alert('Please enter a trip name.');return}t.name=name;save();renderTrips();closeModal('tripEditModal');showToast('Trip name updated.','success');}
-function deleteTripFromEditor(){if(state.trips.length<=1){showToast('Create another trip before deleting the only trip.','warning');return}const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;if(!confirm(`Delete “${t.name}” and all ${t.flights?.length??state.flights.length} flights and ${t.routes?.length??state.routes.length} routes belonging to it? This cannot be undone unless you have exported a JSON backup.`))return;snapshotActiveTrip();state.trips=state.trips.filter(x=>x.id!==t.id);const next=state.trips[0];const plan=normalizePlan(next);state={...state,...plan,activeTripId:next.id,trips:state.trips};save();render();closeModal('tripEditModal');showToast('Trip deleted.','success');}
+async function deleteTripFromEditor(){if(state.trips.length<=1){showToast('Create another trip before deleting the only trip.','warning');return}const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;if(!confirm(`Delete “${t.name}” and all ${t.flights?.length??state.flights.length} flights and ${t.routes?.length??state.routes.length} routes belonging to it? This cannot be undone unless you have exported a JSON backup.`))return;snapshotActiveTrip();if(cloudSyncEnabled&&!await guardedCloudDelete(t.id)){showToast('The trip was not deleted locally because its cloud copy changed or could not be safely deleted. Refresh cloud and resolve the conflict first.','warning');return}state.trips=state.trips.filter(x=>x.id!==t.id);const next=state.trips[0];const plan=normalizePlan(next);state={...state,...plan,activeTripId:next.id,trips:state.trips};save();render();closeModal('tripEditModal');showToast('Trip deleted.','success');}
 function flight(id){return state.flights.find(f=>f.id===id)}
 function route(id){return state.routes.find(r=>r.id===id)}
 function routeFlights(r){return (r?.flightIds||[]).map(flight).filter(Boolean)}
@@ -155,6 +171,310 @@ function importJSON(file){const reader=new FileReader();reader.onload=()=>{try{s
 function removeFlight(id){if(!flight(id))return;if(!confirm('Delete this flight from the planner? It will also be removed from any routes that use it.'))return;state.flights=state.flights.filter(f=>f.id!==id);state.routes.forEach(r=>r.flightIds=r.flightIds.filter(fid=>fid!==id));save();render();closeModal('flightModal')}
 function removeRoute(id){if(!route(id))return;if(!confirm('Delete this route? Its flights will remain in the planner.'))return;state.routes=state.routes.filter(r=>r.id!==id);if(!state.routes.some(r=>r.preferred)&&state.routes.length)state.routes[0].preferred=true;state.selectedRoute=state.routes[0]?.id||'';save();render();closeModal('routeModal')}
 
+// ---------- Supabase cloud sync ----------
+function setCloudStatus(message, kind='info') {
+  const el=$('cloudStatus');
+  if(!el)return;
+  el.textContent=message;
+  el.style.color=kind==='error'?'var(--red)':kind==='success'?'var(--green)':kind==='warning'?'var(--amber)':'var(--muted)';
+}
+function setCloudUi() {
+  $('cloudSignOutBtn').classList.toggle('hidden',!cloudUser);
+  $('cloudSignInBtn').classList.toggle('hidden',!!cloudUser);
+  $('cloudEmail').classList.toggle('hidden',!!cloudUser);
+  $('cloudRefreshBtn').disabled=!cloudUser||cloudBusy;
+  $('cloudSignInBtn').disabled=cloudBusy;
+  $('cloudSignOutBtn').disabled=cloudBusy;
+  if(cloudUser) $('cloudHelp').textContent=cloudSyncEnabled?'Cloud sync is enabled. Changes are saved locally first and then synced with conflict checks.':'Signed in, but syncing is paused until you choose how to reconcile local and cloud trips.';
+  else $('cloudHelp').textContent='Sign in with your email to enable cloud sync. Your local data remains available on this device.';
+}
+function canonicalTrip(trip) {
+  const plan=normalizePlan(trip);
+  return JSON.stringify({id:String(trip.id),name:String(trip.name||'Untitled trip'),flights:plan.flights,routes:plan.routes,selectedRoute:plan.selectedRoute,nextMinBuffer:Number(trip.nextMinBuffer)||120});
+}
+function tripPayload(trip) {
+  const plan=normalizePlan(trip);
+  return {id:String(trip.id),name:String(trip.name||'Untitled trip'),flights:plan.flights,routes:plan.routes,selectedRoute:plan.selectedRoute,nextMinBuffer:Number(trip.nextMinBuffer)||120};
+}
+function rowsToTrips(rows) {
+  return rows.map(row=>{
+    const d=row.data||{};
+    const plan=normalizePlan(d);
+    return {id:String(row.trip_id),name:String(row.name||d.name||'Untitled trip'),...plan};
+  });
+}
+function stateFromTrips(trips,preferredId) {
+  if(!trips.length) return demoState();
+  const activeTripId=trips.some(t=>t.id===preferredId)?preferredId:trips[0].id;
+  const active=trips.find(t=>t.id===activeTripId);
+  const plan=normalizePlan(active);
+  return {...plan,activeTripId,trips};
+}
+function saveLocalBackup(reason='cloud sync') {
+  try {
+    snapshotActiveTrip();
+    const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+    const key=BACKUP_PREFIX+stamp;
+    localStorage.setItem(key,JSON.stringify({reason,createdAt:new Date().toISOString(),state}));
+    return key;
+  } catch(e) {
+    console.error('Could not create local backup',e);
+    throw new Error('Could not create a local backup. No cloud data was loaded. Check browser storage space/settings and try again.');
+  }
+}
+function currentTrips() { snapshotActiveTrip(); return (state.trips||[]).map(t=>({...t})); }
+function updateMetaFromRows(rows) {
+  cloudMeta=new Map();
+  for(const row of rows) cloudMeta.set(String(row.trip_id),{updated_at:row.updated_at,canonical:canonicalTrip({id:String(row.trip_id),name:row.name,...(row.data||{})})});
+  cloudConflicts.clear();
+}
+async function fetchCloudRows() {
+  const {data,error}=await supabaseClient.from('routeweaver_trips').select('trip_id,name,data,created_by,updated_at').order('updated_at',{ascending:true});
+  if(error)throw error;
+  return data||[];
+}
+async function insertCloudTrip(trip) {
+  const payload=tripPayload(trip);
+  const {data,error}=await supabaseClient.from('routeweaver_trips').insert({trip_id:String(trip.id),name:payload.name,data:payload,created_by:cloudUser.id}).select('trip_id,name,data,created_by,updated_at').single();
+  if(error)throw error;
+  cloudMeta.set(String(data.trip_id),{updated_at:data.updated_at,canonical:canonicalTrip({id:String(data.trip_id),name:data.name,...(data.data||{})})});
+  return data;
+}
+async function guardedCloudDelete(id) {
+  if(!cloudSyncEnabled||!cloudMeta.has(String(id)))return true;
+  const baseline=cloudMeta.get(String(id));
+  const {data:latest,error:readError}=await supabaseClient.from('routeweaver_trips').select('updated_at').eq('trip_id',String(id)).maybeSingle();
+  if(readError){console.error(readError);return false;}
+  if(!latest){cloudMeta.delete(String(id));return true;}
+  if(latest.updated_at!==baseline.updated_at){cloudConflicts.add(String(id));setCloudStatus(`Conflict: “${state.trips.find(t=>t.id===id)?.name||id}” changed in the cloud. Refresh before deleting.`, 'warning');return false;}
+  const {data,error}=await supabaseClient.from('routeweaver_trips').delete().eq('trip_id',String(id)).eq('updated_at',baseline.updated_at).select('trip_id');
+  if(error){console.error(error);return false;}
+  if(!data||data.length!==1){cloudConflicts.add(String(id));return false;}
+  cloudMeta.delete(String(id));cloudConflicts.delete(String(id));
+  return true;
+}
+function scheduleCloudSync() {
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(()=>{if(cloudBusy){scheduleCloudSync();return;}syncLocalChanges();},900);
+}
+async function syncLocalChanges() {
+  if(!cloudSyncEnabled||!cloudUser)return;
+  if(cloudBusy){scheduleCloudSync();return;}
+  cloudBusy=true;setCloudUi();
+  let synced=0,conflicts=0,errors=0;
+  try {
+    for(const trip of currentTrips()) {
+      const id=String(trip.id);
+      if(cloudConflicts.has(id)){conflicts++;continue;}
+      const canonical=canonicalTrip(trip);
+      const baseline=cloudMeta.get(id);
+      if(!baseline) {
+        try { await insertCloudTrip(trip); synced++; }
+        catch(e) {
+          console.error('Could not add trip to cloud',id,e);
+          if(String(e.code||'')==='23505') { cloudConflicts.add(id); conflicts++; }
+          else errors++;
+        }
+        continue;
+      }
+      if(canonical===baseline.canonical)continue;
+      // Read-before-write plus an updated_at compare-and-swap prevents silently overwriting a newer cloud version.
+      const {data:latest,error:readError}=await supabaseClient.from('routeweaver_trips').select('updated_at').eq('trip_id',id).maybeSingle();
+      if(readError){console.error(readError);errors++;continue;}
+      if(!latest||latest.updated_at!==baseline.updated_at){cloudConflicts.add(id);conflicts++;continue;}
+      const payload=tripPayload(trip);
+      const {data,error}=await supabaseClient.from('routeweaver_trips').update({name:payload.name,data:payload}).eq('trip_id',id).eq('updated_at',baseline.updated_at).select('trip_id,name,data,updated_at');
+      if(error){console.error(error);errors++;continue;}
+      if(!data||data.length!==1){cloudConflicts.add(id);conflicts++;continue;}
+      cloudMeta.set(id,{updated_at:data[0].updated_at,canonical:canonicalTrip({id,name:data[0].name,...(data[0].data||{})})});synced++;
+    }
+    if(conflicts) setCloudStatus(`Sync paused for ${conflicts} trip(s) changed in the cloud. Use Refresh cloud to review; newer cloud data was not overwritten.`, 'warning');
+    else if(errors) setCloudStatus(`Sync partly completed (${synced} trip(s) synced; ${errors} error(s)). Check the browser console or connection and retry.`, 'error');
+    else setCloudStatus(synced?`Cloud sync up to date · ${new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})}`:'Cloud sync is up to date.', 'success');
+  } finally {cloudBusy=false;setCloudUi();}
+}
+async function applyCloudRows(rows,{replace=false}={}) {
+  if(replace&&!rows.length)throw new Error('The cloud contains no trips. Refusing to replace local data with an empty cloud.');
+  const cloudTrips=rowsToTrips(rows);
+  const local=currentTrips();
+  let trips;
+  if(replace) trips=cloudTrips;
+  else {
+    const byId=new Map(local.map(t=>[String(t.id),t]));
+    for(const ct of cloudTrips)byId.set(String(ct.id),ct);
+    trips=[...byId.values()];
+  }
+  const backupKey=saveLocalBackup('before applying cloud trips');
+  const next=stateFromTrips(trips,state.activeTripId);
+  suppressCloudSchedule=true;
+  try {state=next;localStorage.setItem(STORE_KEY,JSON.stringify(state));render();}
+  finally {suppressCloudSchedule=false;}
+  updateMetaFromRows(rows);
+  cloudSyncEnabled=true;
+  setCloudStatus(`Loaded cloud data. Local backup saved in this browser (${backupKey}).`, 'success');
+  setCloudUi();
+  if(!replace)scheduleCloudSync();
+}
+async function bootstrapCloud() {
+  if(!cloudUser||cloudBusy)return;
+  cloudBusy=true;cloudSyncEnabled=false;setCloudUi();setCloudStatus('Checking cloud trips…');
+  try {
+    const rows=await fetchCloudRows();
+    const local=currentTrips();
+    if(!rows.length) {
+      if(!local.length){cloudSyncEnabled=true;updateMetaFromRows([]);setCloudStatus('Cloud is empty. New trips will sync automatically.','success');return;}
+      const upload=confirm(`No trips exist in the cloud yet. Upload your ${local.length} local trip(s) to Supabase now? Your local data will be kept.`);
+      if(!upload){setCloudStatus('Signed in. Cloud is empty; syncing is paused until you refresh and choose to upload.','warning');return;}
+      updateMetaFromRows([]);cloudSyncEnabled=true;
+      for(const trip of local) await insertCloudTrip(trip);
+      setCloudStatus(`Uploaded ${local.length} local trip(s). Cloud sync is enabled.`,'success');
+      return;
+    }
+    const choice=prompt(`Found ${rows.length} trip(s) in the cloud and ${local.length} local trip(s). Choose one option:\n\n1 = Load cloud trips (a timestamped local backup is saved first; cloud replaces local trips).\n2 = Merge cloud trips and upload only local trips whose IDs are not already in the cloud. Existing cloud rows will not be overwritten.\n\nCancel or anything else = keep local data and leave syncing paused.`,'1');
+    if(choice==='1') {
+      await applyCloudRows(rows,{replace:true});
+    } else if(choice==='2') {
+      updateMetaFromRows(rows);
+      const remoteIds=new Set(rows.map(r=>String(r.trip_id)));
+      const localIds=new Set(local.map(t=>String(t.id)));
+      const missing=local.filter(t=>!remoteIds.has(String(t.id)));
+      const localById=new Set(local.map(t=>String(t.id)));
+      const merged=[...local,...rowsToTrips(rows).filter(t=>!localById.has(String(t.id)))];
+      const backupKey=saveLocalBackup('before merging local and cloud trips');
+      const next=stateFromTrips(merged,state.activeTripId);
+      suppressCloudSchedule=true;
+      try {state=next;localStorage.setItem(STORE_KEY,JSON.stringify(state));render();}
+      finally {suppressCloudSchedule=false;}
+      cloudSyncEnabled=true;
+      for(const trip of missing) await insertCloudTrip(trip);
+      // Existing IDs with different content are deliberately marked as conflicts rather than overwritten.
+      for(const trip of local.filter(t=>remoteIds.has(String(t.id)))) {
+        const meta=cloudMeta.get(String(trip.id));
+        if(meta&&canonicalTrip(trip)!==meta.canonical)cloudConflicts.add(String(trip.id));
+      }
+      setCloudStatus(`Merged cloud trips; uploaded ${missing.length} new local trip(s). Local backup saved (${backupKey}).${cloudConflicts.size?' Some same-ID trips differ and need Refresh cloud review.':''}`,'success');
+    } else {
+      updateMetaFromRows(rows);
+      setCloudStatus('Signed in. Local data kept; syncing is paused. Use Refresh cloud when ready to reconcile.','warning');
+    }
+  } catch(e) {
+    console.error('Cloud setup failed',e);
+    cloudSyncEnabled=false;
+    setCloudStatus(`Cloud setup failed: ${e.message||e}. Local data has been kept. Check Supabase configuration, authentication and table policies.`, 'error');
+  } finally {cloudBusy=false;setCloudUi();}
+}
+async function refreshCloud() {
+  if(!cloudUser||cloudBusy)return;
+  cloudBusy=true;setCloudUi();setCloudStatus('Refreshing cloud trips…');
+  try {
+    const rows=await fetchCloudRows();
+    const local=currentTrips();
+    const previousMeta=new Map(cloudMeta);
+    if(!rows.length&&!previousMeta.size) {
+      const upload=confirm(`The cloud contains no trips. Upload your ${local.length} local trip(s)? Your local data will be kept.`);
+      if(upload) {
+        updateMetaFromRows([]);cloudSyncEnabled=true;
+        for(const trip of local)await insertCloudTrip(trip);
+        setCloudStatus(`Uploaded ${local.length} local trip(s). Cloud sync is enabled.`, 'success');
+      } else {
+        cloudSyncEnabled=false;
+        setCloudStatus('Cloud is empty. Local data was kept and syncing remains paused.', 'warning');
+      }
+      return;
+    }
+    const remoteById=new Map(rows.map(r=>[String(r.trip_id),r]));
+    const missingRemoteIds=[...previousMeta.keys()].filter(id=>!remoteById.has(id));
+    const newRows=rows.filter(r=>!previousMeta.has(String(r.trip_id)));
+    const changedRows=rows.filter(r=>previousMeta.has(String(r.trip_id))&&previousMeta.get(String(r.trip_id)).updated_at!==r.updated_at);
+    const localDirty=local.some(t=>{const m=previousMeta.get(String(t.id));return m&&canonicalTrip(t)!==m.canonical;});
+    if(missingRemoteIds.length) {
+      for(const id of missingRemoteIds) cloudConflicts.add(id);
+      updateMetaFromRows(rows);
+      for(const id of missingRemoteIds) { const old=previousMeta.get(id); if(old)cloudMeta.set(id,old); cloudConflicts.add(id); }
+      cloudSyncEnabled=true;
+      setCloudStatus(`${missingRemoteIds.length} trip(s) known locally are missing from the cloud. Their local copies are being kept; syncing is blocked for those trips.`, 'warning');
+    }
+    if(!cloudSyncEnabled) {
+      const choice=prompt(`Refresh found ${rows.length} cloud trip(s). Choose:\n\n1 = Load cloud trips and replace local trips (timestamped local backup first).\n2 = Merge cloud trips into local data; cloud versions replace same-ID local trips (backup first).\n\nCancel/anything else = keep local data and leave syncing paused.`,'2');
+      if(choice==='1'||choice==='2') await applyCloudRows(rows,{replace:choice==='1'});
+      else {updateMetaFromRows(rows);setCloudStatus('Cloud metadata refreshed; local data kept and syncing remains paused.','warning');}
+      return;
+    }
+    const remoteChanged=rows.some(r=>!previousMeta.has(String(r.trip_id))||previousMeta.get(String(r.trip_id)).updated_at!==r.updated_at);
+    if(missingRemoteIds.length) {
+      setCloudStatus(`${missingRemoteIds.length} cloud deletion(s) detected. Local copies are preserved and those trips will not be re-uploaded automatically.`, 'warning');
+      return;
+    }
+    if(remoteChanged) {
+      const details=`Cloud changes found (${newRows.length} new, ${changedRows.length} updated). Loading cloud versions will replace local copies with matching trip IDs. A timestamped local backup will be saved first. Continue?`;
+      if(!confirm(details)) {setCloudStatus('Cloud changes detected; local data kept. Sync is paused for safety.','warning');cloudSyncEnabled=false;for(const row of rows)if(!previousMeta.has(String(row.trip_id))||previousMeta.get(String(row.trip_id)).updated_at!==row.updated_at)cloudConflicts.add(String(row.trip_id));return;}
+      await applyCloudRows(rows,{replace:false});
+    } else if(cloudConflicts.size) {
+      const choice=prompt(`There are ${cloudConflicts.size} trip conflict(s). Choose how to resolve them:\n\n1 = Load cloud versions for matching trips (timestamped local backup first).\n2 = Keep local versions and upload them only if the cloud has not changed since the last check.\n\nCancel or anything else = leave syncing paused for safety.`,'1');
+      if(choice==='1') await applyCloudRows(rows,{replace:false});
+      else if(choice==='2') {
+        updateMetaFromRows(rows);cloudSyncEnabled=true;cloudBusy=false;setCloudUi();
+        await syncLocalChanges();
+      } else {cloudSyncEnabled=false;setCloudStatus('Conflicts remain unresolved; cloud syncing is paused.','warning');}
+      return;
+    } else {
+      updateMetaFromRows(rows);
+      cloudSyncEnabled=true;
+      cloudBusy=false;setCloudUi();
+      await syncLocalChanges();
+      if(!localDirty)setCloudStatus('Cloud refreshed; no remote changes found.','success');
+    }
+  } catch(e) {
+    console.error('Cloud refresh failed',e);setCloudStatus(`Refresh failed: ${e.message||e}. Local data has been kept.`,'error');
+  } finally {cloudBusy=false;setCloudUi();}
+}
+async function initCloud() {
+  const url=window.SUPABASE_URL;
+  const key=window.SUPABASE_ANON_KEY;
+  if(!window.supabase||!url||!key||String(url).includes('YOUR_')||String(key).includes('YOUR_')) {
+    $('cloudSignInBtn').disabled=true;$('cloudRefreshBtn').disabled=true;
+    setCloudStatus('Cloud sync is not configured. Check config.js contains window.SUPABASE_URL and window.SUPABASE_ANON_KEY.');setCloudUi();return;
+  }
+  try {supabaseClient=window.supabase.createClient(url,key);} catch(e) {setCloudStatus('Could not initialise Supabase: '+e.message,'error');return;}
+  $('cloudSignInBtn').addEventListener('click',async()=>{
+    const email=$('cloudEmail').value.trim();
+    if(!email){alert('Enter your email address first.');return;}
+    cloudBusy=true;setCloudUi();setCloudStatus('Sending sign-in link…');
+    try {
+      const redirect=window.location.origin+window.location.pathname;
+      const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirect}});
+      if(error)throw error;
+      setCloudStatus('Sign-in link sent. Open the email on this device/browser to finish signing in.','success');
+    } catch(e) {setCloudStatus('Could not send sign-in link: '+(e.message||e),'error');}
+    finally {cloudBusy=false;setCloudUi();}
+  });
+  $('cloudSignOutBtn').addEventListener('click',async()=>{
+    if(!confirm('Sign out of RouteWeaver cloud sync on this browser? Local trips will remain saved.'))return;
+    cloudSyncEnabled=false;cloudUser=null;authUserId=null;cloudMeta.clear();cloudConflicts.clear();
+    const {error}=await supabaseClient.auth.signOut();
+    if(error)setCloudStatus('Signed out locally, but Supabase reported: '+error.message,'warning');
+    else setCloudStatus('Signed out. Your local trips remain available on this device.');
+    setCloudUi();
+  });
+  $('cloudRefreshBtn').addEventListener('click',refreshCloud);
+  supabaseClient.auth.onAuthStateChange((event,session)=>{
+    // Defer Supabase data calls outside the auth callback to avoid locking the auth client.
+    setTimeout(async()=>{
+      const nextUser=session?.user||null;
+      const nextId=nextUser?.id||null;
+      if(nextId===authUserId)return; // Ignore duplicate INITIAL_SESSION notifications.
+      authUserId=nextId;cloudUser=nextUser;
+      if(cloudUser) await bootstrapCloud();
+      else {cloudSyncEnabled=false;cloudMeta.clear();cloudConflicts.clear();setCloudStatus('Not signed in. Local trips remain saved on this device.');setCloudUi();}
+    },0);
+  });
+  const {data:{session},error}=await supabaseClient.auth.getSession();
+  if(error)throw error;
+  cloudUser=session?.user||null;authUserId=cloudUser?.id||null;
+  if(cloudUser)await bootstrapCloud();
+  else {setCloudStatus('Not signed in. Local trips remain saved on this device.');setCloudUi();}
+}
+
 state=load();render();
 $('tripSelect').addEventListener('change',e=>switchTrip(e.target.value));$('addTripBtn').addEventListener('click',addTrip);$('editTripBtn').addEventListener('click',openTripEditor);$('tripEditForm').addEventListener('submit',e=>{e.preventDefault();renameTripFromEditor()});$('deleteTripFromEditorBtn').addEventListener('click',deleteTripFromEditor);
 $('addFlightBtn').addEventListener('click',()=>openFlight());$('addRouteBtn').addEventListener('click',()=>openRoute());$('copyTripBtn').addEventListener('click',copyTripJSON);$('editRouteBtn').addEventListener('click',()=>state.selectedRoute&&openRoute(state.selectedRoute));$('exportBtn').addEventListener('click',exportJSON);$('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value=''});
@@ -165,6 +485,7 @@ $('addToSequenceBtn').addEventListener('click',()=>{const id=$('flightPicker').v
 $('flightForm').addEventListener('submit',e=>{e.preventDefault();const id=$('flightId').value||uid('f');const f={id,origin:$('origin').value.trim().toUpperCase(),destination:$('destination').value.trim().toUpperCase(),flightNumber:$('flightNumber').value.trim().toUpperCase(),aircraftType:$('aircraftType').value.trim().toUpperCase(),cabinClass:$('cabinClass').value,departAt:$('departDate').value+'T'+$('departTime').value,arriveAt:$('arriveDate').value+'T'+$('arriveTime').value,type:$('flightType').value,cost:Math.max(0,Number($('cost').value)||0),buffer:Math.max(0,Number($('buffer').value)||0),availability:$('availability').value,notes:$('flightNotes').value.trim(),locked:$('locked').checked};if(new Date(f.arriveAt)<new Date(f.departAt)){alert('Arrival must be after departure.');return}const idx=state.flights.findIndex(x=>x.id===id);if(idx>=0)state.flights[idx]=f;else state.flights.push(f);save();render();closeModal('flightModal')});$('deleteFlightBtn').addEventListener('click',()=>removeFlight($('flightId').value));
 $('routeForm').addEventListener('submit',e=>{e.preventDefault();const id=$('routeId').value||uid('r');const r={id,name:$('routeName').value.trim(),notes:$('routeNotes').value.trim(),flightIds:[...editSequence],preferred:$('routePreferred').checked,whatIf:$('routeUnavailable').checked};if(!r.name){alert('Please give this route a name.');return}const existing=state.routes.findIndex(x=>x.id===id);if(existing>=0)state.routes[existing]=r;else state.routes.push(r);if(r.preferred)state.routes.forEach(x=>{if(x.id!==id)x.preferred=false});else if(!state.routes.some(x=>x.preferred))r.preferred=true;state.selectedRoute=id;save();render();closeModal('routeModal')});$('deleteRouteBtn').addEventListener('click',()=>removeRoute($('routeId').value));
 window.addEventListener('resize',()=>renderGraph());
+initCloud().catch(e=>{console.error('Cloud initialisation failed',e);setCloudStatus('Cloud initialisation failed: '+(e.message||e),'error');});
 })();
 </script>
 </body>
