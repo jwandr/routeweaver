@@ -22,8 +22,8 @@
     <div class="toolbar trip-toolbar" aria-label="Trip controls"><label for="tripSelect">Current trip</label><select id="tripSelect" aria-label="Current trip"></select><button id="addTripBtn">＋ New Trip</button><button id="editTripBtn">Edit Trip</button><button id="exportBtn">Export JSON</button><button id="importBtn">Import JSON</button><input id="importFile" type="file" accept="application/json,.json" class="hidden"></div>
   </header>
   <section class="panel cloud-panel" aria-labelledby="cloudTitle">
-    <div class="panelhead"><div><h2 id="cloudTitle">Cloud sync</h2><p id="cloudStatus" role="status" aria-live="polite">Checking Supabase configuration…</p></div><div class="row cloud-actions"><button id="cloudRefreshBtn" class="small" disabled>Refresh cloud</button><button id="cloudSignOutBtn" class="small hidden">Sign out</button></div></div>
-    <div class="panelbody cloud-body"><div class="row cloud-login"><label for="cloudEmail">Email</label><input id="cloudEmail" type="email" autocomplete="email" placeholder="you@example.com"><button id="cloudSignInBtn" class="small primary">Send sign-in link</button></div><p class="tiny muted" id="cloudHelp">Sign in with your email to enable cloud sync. Your local data remains available on this device.</p></div>
+    <div class="panelhead"><div><h2 id="cloudTitle">RouteWeaver account</h2><p id="cloudStatus" role="status" aria-live="polite">Connecting to Supabase…</p></div><div class="row cloud-actions"><span id="cloudSignedIn" class="tiny muted hidden"></span><button id="cloudRefreshBtn" class="small hidden" disabled>Refresh database</button><button id="cloudSignOutBtn" class="small hidden">Sign out</button></div></div>
+    <div class="panelbody cloud-body"><div class="row cloud-login"><label for="cloudEmail">Email</label><input id="cloudEmail" type="email" autocomplete="email" placeholder="you@example.com"><button id="cloudSignInBtn" class="small primary">Send sign-in link</button></div><p class="tiny muted" id="cloudHelp">Sign in to load and save your trips directly to the database. RouteWeaver does not save trip data in this browser.</p></div>
   </section>
   <div class="layout">
     <main class="maincol">
@@ -43,10 +43,10 @@
       <section class="panel"><div class="panelhead"><div><h2>Planning notes</h2></div></div><div class="panelbody tiny muted">This is a planning aid, not a live flight search. Check actual schedules, standby rules, terminal changes, visa requirements and minimum connection times with the relevant airlines. Route feasibility warnings use the times and minimum connection buffer you enter.</div></section>
     </aside>
   </div>
-  <div class="footer-note">Trips are saved in this browser on this device. Cloud sync is optional; JSON export remains available for backups. Copy Trip JSON copies only the current trip.</div>
+  <div class="footer-note">Trips are loaded from and saved directly to the RouteWeaver database. No trip data is saved locally in this browser. Export JSON creates a manual backup; Copy Trip JSON copies only the current trip.</div>
 </div>
 
-<div class="modal-backdrop" id="tripEditModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="tripEditTitle"><div class="modalhead"><h2 id="tripEditTitle">Edit trip</h2><button type="button" data-close="tripEditModal" aria-label="Close">✕</button></div><form id="tripEditForm"><div class="modalbody"><div class="field"><label for="tripNameInput">Trip name</label><input id="tripNameInput" required maxlength="120" placeholder="e.g. Return from Kigali"></div><p class="tiny muted" style="margin:12px 0 0">Deleting a trip removes all its flights and routes from this browser. Export a backup first if you may need them later.</p><p id="lastTripWarning" class="warning hidden">You can't delete the only remaining trip. Create another trip first if you want to remove this one.</p></div><div class="modalfoot"><button type="button" class="danger" id="deleteTripFromEditorBtn">Delete Trip</button><span class="spacer"></span><button type="button" data-close="tripEditModal">Cancel</button><button type="submit" class="primary">Save Name</button></div></form></div></div>
+<div class="modal-backdrop" id="tripEditModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="tripEditTitle"><div class="modalhead"><h2 id="tripEditTitle">Edit trip</h2><button type="button" data-close="tripEditModal" aria-label="Close">✕</button></div><form id="tripEditForm"><div class="modalbody"><div class="field"><label for="tripNameInput">Trip name</label><input id="tripNameInput" required maxlength="120" placeholder="e.g. Return from Kigali"></div><p class="tiny muted" style="margin:12px 0 0">Deleting a trip removes it from the database. Export a JSON backup first if you may need it later.</p><p id="lastTripWarning" class="warning hidden">You can't delete the only remaining trip. Create another trip first if you want to remove this one.</p></div><div class="modalfoot"><button type="button" class="danger" id="deleteTripFromEditorBtn">Delete Trip</button><span class="spacer"></span><button type="button" data-close="tripEditModal">Cancel</button><button type="submit" class="primary">Save Name</button></div></form></div></div>
 
 <div class="modal-backdrop" id="flightModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="flightModalTitle"><div class="modalhead"><h2 id="flightModalTitle">Add flight</h2><button data-close="flightModal" aria-label="Close">✕</button></div><form id="flightForm"><div class="modalbody"><input type="hidden" id="flightId"><div class="formgrid">
   <div class="field"><label for="origin">Origin airport code</label><input id="origin" required maxlength="3" pattern="[A-Za-z]{3}" placeholder="PER" autocapitalize="characters"></div>
@@ -73,7 +73,6 @@
 <script>
 (() => {
 'use strict';
-const STORE_KEY='routeweaver-v3';
 const $=id=>document.getElementById(id);
 const uid=prefix=>prefix+'_'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -90,11 +89,9 @@ let cloudUser = null;
 let authUserId = null;
 let cloudSyncEnabled = false;
 let cloudBusy = false;
-let suppressCloudSchedule = false;
 let cloudMeta = new Map();       // trip id -> { updated_at, canonical }
 let cloudConflicts = new Set();  // trip IDs changed remotely since last sync
 let cloudTimer = null;
-const BACKUP_PREFIX = STORE_KEY + '-backup-';
 function demoState(){
  const flights=[
   {id:'f_per_doh_early',origin:'DOH',destination:'ZNZ',departAt:'2027-01-29T02:05',arriveAt:'2027-01-29T19:30',flightNumber:'',cabinClass:'economy',type:'standby',cost:680,buffer:120,availability:'planned',notes:'Earlier departure fallback; example cost only.',locked:false},
@@ -130,14 +127,13 @@ function normalize(s){
  return {...plan,activeTripId:id,trips:[trip]};
 }
 function snapshotActiveTrip(){if(!state?.trips||!state.activeTripId)return;const i=state.trips.findIndex(t=>t.id===state.activeTripId);if(i<0)return;state.trips[i]={...state.trips[i],flights:state.flights,routes:state.routes,selectedRoute:state.selectedRoute,nextMinBuffer:state.nextMinBuffer};}
-function save(){try{snapshotActiveTrip();localStorage.setItem(STORE_KEY,JSON.stringify(state));if(cloudSyncEnabled&&!suppressCloudSchedule)scheduleCloudSync();}catch(e){console.warn('Could not save locally',e)}}
-function load(){try{const raw=localStorage.getItem(STORE_KEY);if(raw)return normalize(JSON.parse(raw));}catch(e){console.warn('Could not load saved plan',e)}return demoState()}
+function save(){snapshotActiveTrip();if(cloudSyncEnabled)scheduleCloudSync();}
 function renderTrips(){const sel=$('tripSelect');sel.innerHTML=(state.trips||[]).map(t=>`<option value="${escapeHtml(t.id)}" ${t.id===state.activeTripId?'selected':''}>${escapeHtml(t.name)}</option>`).join('');$('editTripBtn').disabled=!(state.trips||[]).length;}
 function switchTrip(id){if(!state.trips.some(t=>t.id===id)||id===state.activeTripId)return;save();const t=state.trips.find(x=>x.id===id);const plan=normalizePlan(t);state={...state,...plan,activeTripId:id,trips:state.trips};save();render();}
-function addTrip(){const name=prompt('Name this trip (e.g. Return from Kigali, ATW1080 — Europe):');if(!name||!name.trim())return;snapshotActiveTrip();const id=uid('trip');const plan={flights:[],routes:[],selectedRoute:'',nextMinBuffer:120};const t={id,name:name.trim(),...plan};state.trips.push(t);state={...state,...plan,activeTripId:id,trips:state.trips};save();render();}
+function addTrip(){if(!cloudSyncEnabled)return;const name=prompt('Name this trip (e.g. Return from Kigali, ATW1080 — Europe):');if(!name||!name.trim())return;snapshotActiveTrip();const id=uid('trip');const plan={flights:[],routes:[],selectedRoute:'',nextMinBuffer:120};const t={id,name:name.trim(),...plan};state.trips.push(t);state={...state,...plan,activeTripId:id,trips:state.trips};save();render();}
 function openTripEditor(){const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;$('tripNameInput').value=t.name;$('deleteTripFromEditorBtn').disabled=state.trips.length<=1;$('lastTripWarning').classList.toggle('hidden',state.trips.length>1);$('tripEditModal').classList.add('open');}
-function renameTripFromEditor(){const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;const name=$('tripNameInput').value.trim();if(!name){alert('Please enter a trip name.');return}t.name=name;save();renderTrips();closeModal('tripEditModal');showToast('Trip name updated.','success');}
-async function deleteTripFromEditor(){if(state.trips.length<=1){showToast('Create another trip before deleting the only trip.','warning');return}const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;if(!confirm(`Delete “${t.name}” and all ${t.flights?.length??state.flights.length} flights and ${t.routes?.length??state.routes.length} routes belonging to it? This cannot be undone unless you have exported a JSON backup.`))return;snapshotActiveTrip();if(cloudSyncEnabled&&!await guardedCloudDelete(t.id)){showToast('The trip was not deleted locally because its cloud copy changed or could not be safely deleted. Refresh cloud and resolve the conflict first.','warning');return}state.trips=state.trips.filter(x=>x.id!==t.id);const next=state.trips[0];const plan=normalizePlan(next);state={...state,...plan,activeTripId:next.id,trips:state.trips};save();render();closeModal('tripEditModal');showToast('Trip deleted.','success');}
+function renameTripFromEditor(){if(!cloudSyncEnabled)return;const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;const name=$('tripNameInput').value.trim();if(!name){alert('Please enter a trip name.');return}t.name=name;save();renderTrips();closeModal('tripEditModal');showToast('Trip name updated.','success');}
+async function deleteTripFromEditor(){if(!cloudSyncEnabled)return;if(state.trips.length<=1){showToast('Create another trip before deleting the only trip.','warning');return}const t=state.trips.find(x=>x.id===state.activeTripId);if(!t)return;if(!confirm(`Delete “${t.name}” and all ${t.flights?.length??state.flights.length} flights and ${t.routes?.length??state.routes.length} routes from the database? This cannot be undone unless you have exported a JSON backup.`))return;snapshotActiveTrip();if(cloudSyncEnabled&&!await guardedCloudDelete(t.id)){showToast('The trip was not deleted locally because its cloud copy changed or could not be safely deleted. Refresh cloud and resolve the conflict first.','warning');return}state.trips=state.trips.filter(x=>x.id!==t.id);const next=state.trips[0];const plan=normalizePlan(next);state={...state,...plan,activeTripId:next.id,trips:state.trips};save();render();closeModal('tripEditModal');showToast('Trip deleted.','success');}
 function flight(id){return state.flights.find(f=>f.id===id)}
 function route(id){return state.routes.find(r=>r.id===id)}
 function routeFlights(r){return (r?.flightIds||[]).map(flight).filter(Boolean)}
@@ -167,26 +163,59 @@ function closeModal(id){$(id).classList.remove('open')}
 function exportJSON(){snapshotActiveTrip();const json=JSON.stringify(state,null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const stamp=new Date().toISOString().slice(0,10);a.href=url;a.download=`routeweaver-backup-${stamp}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('Full JSON backup downloaded, including all trips.','success')}
 async function copyTripJSON(){snapshotActiveTrip();const t=state.trips.find(x=>x.id===state.activeTripId);if(!t){showToast('No current trip to copy.','warning');return}const payload={tripId:t.id,tripName:t.name,flights:state.flights,routes:state.routes,selectedRoute:state.selectedRoute,nextMinBuffer:state.nextMinBuffer};const json=JSON.stringify(payload,null,2);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(json);showToast(`JSON for “${t.name}” copied to clipboard.`,'success');return}}catch(e){console.warn('Clipboard API unavailable; trying fallback.',e)}const area=document.createElement('textarea');area.value=json;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();let copied=false;try{copied=document.execCommand('copy')}catch(e){}area.remove();if(copied){showToast(`JSON for “${t.name}” copied to clipboard.`,'success')}else{showToast('Clipboard access was blocked. A JSON text window may open so you can copy the current trip manually.','warning');const w=window.open('','_blank','width=720,height=600');if(w){w.document.write('<title>RouteWeaver Trip JSON</title><textarea style="width:98%;height:95%;font:12px monospace"></textarea>');w.document.querySelector('textarea').value=json;w.document.close()}}}
 function showToast(message,kind='success'){let el=$('toast');if(!el){el=document.createElement('div');el.id='toast';el.setAttribute('role','status');el.style.cssText='position:fixed;right:18px;bottom:18px;z-index:100;max-width:min(520px,calc(100vw - 36px));padding:12px 16px;border-radius:9px;box-shadow:0 8px 24px #0002;font-size:13px';document.body.appendChild(el)}el.style.background=kind==='warning'?'#fff3d2':'#e2f8ee';el.style.color=kind==='warning'?'#765200':'#155e46';el.textContent=message;clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>el.remove(),7000)}
-function importJSON(file){const reader=new FileReader();reader.onload=()=>{try{state=normalize(JSON.parse(reader.result));save();render();alert('Plan imported successfully.')}catch(e){alert('Could not import plan: '+e.message)}};reader.readAsText(file)}
-function removeFlight(id){if(!flight(id))return;if(!confirm('Delete this flight from the planner? It will also be removed from any routes that use it.'))return;state.flights=state.flights.filter(f=>f.id!==id);state.routes.forEach(r=>r.flightIds=r.flightIds.filter(fid=>fid!==id));save();render();closeModal('flightModal')}
-function removeRoute(id){if(!route(id))return;if(!confirm('Delete this route? Its flights will remain in the planner.'))return;state.routes=state.routes.filter(r=>r.id!==id);if(!state.routes.some(r=>r.preferred)&&state.routes.length)state.routes[0].preferred=true;state.selectedRoute=state.routes[0]?.id||'';save();render();closeModal('routeModal')}
+function importJSON(file){
+ if(!cloudSyncEnabled){alert('Sign in and wait for your trips to load before importing.');return}
+ const reader=new FileReader();
+ reader.onload=async()=>{
+  try{
+   const imported=normalize(JSON.parse(reader.result));
+   if(!confirm('Replace the trips in the database with the trips in this JSON file? Any database trips not included in the file will be deleted. Export a backup first.'))return;
+   const latestRows=await fetchCloudRows();
+   for(const row of latestRows){const baseline=cloudMeta.get(String(row.trip_id));if(!baseline||baseline.updated_at!==row.updated_at){alert('The database changed since it was loaded. Nothing was imported. Refresh the database and try again.');return}}
+   const importedIds=new Set(imported.trips.map(t=>String(t.id)));
+   const retainedRows=[];
+   for(const row of latestRows){
+    if(importedIds.has(String(row.trip_id))){retainedRows.push(row);continue;}
+    const {data,error}=await supabaseClient.from('routeweaver_trips').delete().eq('trip_id',String(row.trip_id)).eq('updated_at',row.updated_at).select('trip_id');
+    if(error||!data||data.length!==1)throw new Error(`Could not safely delete database trip ${row.name||row.trip_id}. Refresh the database and check the result before trying again.`);
+   }
+   state=imported;updateMetaFromRows(retainedRows);render();save();showToast('JSON imported. Saving the imported trips to the database…','success');
+  }catch(e){alert('Could not import plan: '+(e.message||e))}
+ };
+ reader.readAsText(file);
+}
+function removeFlight(id){if(!cloudSyncEnabled||!flight(id))return;if(!confirm('Delete this flight from the planner? It will also be removed from any routes that use it.'))return;state.flights=state.flights.filter(f=>f.id!==id);state.routes.forEach(r=>r.flightIds=r.flightIds.filter(fid=>fid!==id));save();render();closeModal('flightModal')}
+function removeRoute(id){if(!cloudSyncEnabled||!route(id))return;if(!confirm('Delete this route? Its flights will remain in the planner.'))return;state.routes=state.routes.filter(r=>r.id!==id);if(!state.routes.some(r=>r.preferred)&&state.routes.length)state.routes[0].preferred=true;state.selectedRoute=state.routes[0]?.id||'';save();render();closeModal('routeModal')}
 
-// ---------- Supabase cloud sync ----------
+// ---------- Database-only Supabase persistence ----------
 function setCloudStatus(message, kind='info') {
-  const el=$('cloudStatus');
-  if(!el)return;
+  const el=$('cloudStatus'); if(!el)return;
   el.textContent=message;
   el.style.color=kind==='error'?'var(--red)':kind==='success'?'var(--green)':kind==='warning'?'var(--amber)':'var(--muted)';
 }
+function setPlannerEnabled(enabled) {
+  const layout=document.querySelector('.layout');
+  const toolbar=document.querySelector('.trip-toolbar');
+  if(layout){layout.style.pointerEvents=enabled?'':'none';layout.style.opacity=enabled?'':'0.55';}
+  if(toolbar){toolbar.style.pointerEvents=enabled?'':'none';toolbar.style.opacity=enabled?'':'0.55';}
+  const ids=['tripSelect','addTripBtn','editTripBtn','exportBtn','importBtn','addFlightBtn','addRouteBtn','copyTripBtn','editRouteBtn'];
+  ids.forEach(id=>{const el=$(id);if(el)el.disabled=!enabled;});
+  $('importFile').disabled=!enabled;
+}
 function setCloudUi() {
-  $('cloudSignOutBtn').classList.toggle('hidden',!cloudUser);
-  $('cloudSignInBtn').classList.toggle('hidden',!!cloudUser);
-  $('cloudEmail').classList.toggle('hidden',!!cloudUser);
-  $('cloudRefreshBtn').disabled=!cloudUser||cloudBusy;
+  const signedIn=!!cloudUser;
+  $('cloudSignInBtn').classList.toggle('hidden',signedIn);
+  $('cloudEmail').classList.toggle('hidden',signedIn);
+  document.querySelector('.cloud-login').classList.toggle('hidden',signedIn);
+  $('cloudSignedIn').classList.toggle('hidden',!signedIn);
+  $('cloudSignedIn').textContent=signedIn?`Signed in · ${cloudUser.email||'account'}`:'';
+  $('cloudSignOutBtn').classList.toggle('hidden',!signedIn);
+  $('cloudRefreshBtn').classList.toggle('hidden',!signedIn);
+  $('cloudRefreshBtn').disabled=!signedIn||cloudBusy;
   $('cloudSignInBtn').disabled=cloudBusy;
   $('cloudSignOutBtn').disabled=cloudBusy;
-  if(cloudUser) $('cloudHelp').textContent=cloudSyncEnabled?'Cloud sync is enabled. Changes are saved locally first and then synced with conflict checks.':'Signed in, but syncing is paused until you choose how to reconcile local and cloud trips.';
-  else $('cloudHelp').textContent='Sign in with your email to enable cloud sync. Your local data remains available on this device.';
+  $('cloudHelp').classList.toggle('hidden',signedIn);
+  setPlannerEnabled(signedIn&&cloudSyncEnabled);
 }
 function canonicalTrip(trip) {
   const plan=normalizePlan(trip);
@@ -197,41 +226,27 @@ function tripPayload(trip) {
   return {id:String(trip.id),name:String(trip.name||'Untitled trip'),flights:plan.flights,routes:plan.routes,selectedRoute:plan.selectedRoute,nextMinBuffer:Number(trip.nextMinBuffer)||120};
 }
 function rowsToTrips(rows) {
-  return rows.map(row=>{
-    const d=row.data||{};
-    const plan=normalizePlan(d);
-    return {id:String(row.trip_id),name:String(row.name||d.name||'Untitled trip'),...plan};
-  });
+  return rows.map(row=>{const d=row.data||{};const plan=normalizePlan(d);return {id:String(row.trip_id),name:String(row.name||d.name||'Untitled trip'),...plan};});
+}
+function emptyState() {
+  const trip={id:uid('trip'),name:'New trip',flights:[],routes:[],selectedRoute:'',nextMinBuffer:120};
+  return {...normalizePlan(trip),activeTripId:trip.id,trips:[trip]};
 }
 function stateFromTrips(trips,preferredId) {
-  if(!trips.length) return demoState();
+  if(!trips.length)return emptyState();
   const activeTripId=trips.some(t=>t.id===preferredId)?preferredId:trips[0].id;
   const active=trips.find(t=>t.id===activeTripId);
-  const plan=normalizePlan(active);
-  return {...plan,activeTripId,trips};
-}
-function saveLocalBackup(reason='cloud sync') {
-  try {
-    snapshotActiveTrip();
-    const stamp=new Date().toISOString().replace(/[:.]/g,'-');
-    const key=BACKUP_PREFIX+stamp;
-    localStorage.setItem(key,JSON.stringify({reason,createdAt:new Date().toISOString(),state}));
-    return key;
-  } catch(e) {
-    console.error('Could not create local backup',e);
-    throw new Error('Could not create a local backup. No cloud data was loaded. Check browser storage space/settings and try again.');
-  }
+  return {...normalizePlan(active),activeTripId,trips};
 }
 function currentTrips() { snapshotActiveTrip(); return (state.trips||[]).map(t=>({...t})); }
 function updateMetaFromRows(rows) {
   cloudMeta=new Map();
-  for(const row of rows) cloudMeta.set(String(row.trip_id),{updated_at:row.updated_at,canonical:canonicalTrip({id:String(row.trip_id),name:row.name,...(row.data||{})})});
+  for(const row of rows)cloudMeta.set(String(row.trip_id),{updated_at:row.updated_at,canonical:canonicalTrip({id:String(row.trip_id),name:row.name,...(row.data||{})})});
   cloudConflicts.clear();
 }
 async function fetchCloudRows() {
   const {data,error}=await supabaseClient.from('routeweaver_trips').select('trip_id,name,data,created_by,updated_at').order('updated_at',{ascending:true});
-  if(error)throw error;
-  return data||[];
+  if(error)throw error;return data||[];
 }
 async function insertCloudTrip(trip) {
   const payload=tripPayload(trip);
@@ -241,249 +256,133 @@ async function insertCloudTrip(trip) {
   return data;
 }
 async function guardedCloudDelete(id) {
-  if(!cloudSyncEnabled||!cloudMeta.has(String(id)))return true;
-  const baseline=cloudMeta.get(String(id));
-  const {data:latest,error:readError}=await supabaseClient.from('routeweaver_trips').select('updated_at').eq('trip_id',String(id)).maybeSingle();
-  if(readError){console.error(readError);return false;}
-  if(!latest){cloudMeta.delete(String(id));return true;}
-  if(latest.updated_at!==baseline.updated_at){cloudConflicts.add(String(id));setCloudStatus(`Conflict: “${state.trips.find(t=>t.id===id)?.name||id}” changed in the cloud. Refresh before deleting.`, 'warning');return false;}
-  const {data,error}=await supabaseClient.from('routeweaver_trips').delete().eq('trip_id',String(id)).eq('updated_at',baseline.updated_at).select('trip_id');
-  if(error){console.error(error);return false;}
-  if(!data||data.length!==1){cloudConflicts.add(String(id));return false;}
-  cloudMeta.delete(String(id));cloudConflicts.delete(String(id));
-  return true;
+  if(!cloudUser||!cloudSyncEnabled)return false;
+  const key=String(id),baseline=cloudMeta.get(key);if(!baseline)return false;
+  const {data:latest,error:readError}=await supabaseClient.from('routeweaver_trips').select('updated_at').eq('trip_id',key).maybeSingle();
+  if(readError||!latest||latest.updated_at!==baseline.updated_at){cloudConflicts.add(key);setCloudStatus('The database version changed or disappeared. Refresh the database before deleting this trip.','warning');return false;}
+  const {data,error}=await supabaseClient.from('routeweaver_trips').delete().eq('trip_id',key).eq('updated_at',baseline.updated_at).select('trip_id');
+  if(error||!data||data.length!==1){cloudConflicts.add(key);return false;}
+  cloudMeta.delete(key);cloudConflicts.delete(key);return true;
 }
 function scheduleCloudSync() {
   clearTimeout(cloudTimer);
-  cloudTimer=setTimeout(()=>{if(cloudBusy){scheduleCloudSync();return;}syncLocalChanges();},900);
+  cloudTimer=setTimeout(()=>{if(cloudBusy){scheduleCloudSync();return;}syncLocalChanges();},650);
 }
 async function syncLocalChanges() {
   if(!cloudSyncEnabled||!cloudUser)return;
   if(cloudBusy){scheduleCloudSync();return;}
-  cloudBusy=true;setCloudUi();
-  let synced=0,conflicts=0,errors=0;
+  cloudBusy=true;setCloudUi();let synced=0,conflicts=0,errors=0;
   try {
     for(const trip of currentTrips()) {
-      const id=String(trip.id);
-      if(cloudConflicts.has(id)){conflicts++;continue;}
-      const canonical=canonicalTrip(trip);
-      const baseline=cloudMeta.get(id);
-      if(!baseline) {
-        try { await insertCloudTrip(trip); synced++; }
-        catch(e) {
-          console.error('Could not add trip to cloud',id,e);
-          if(String(e.code||'')==='23505') { cloudConflicts.add(id); conflicts++; }
-          else errors++;
-        }
-        continue;
-      }
+      const id=String(trip.id);if(cloudConflicts.has(id)){conflicts++;continue;}
+      const canonical=canonicalTrip(trip),baseline=cloudMeta.get(id);
+      if(!baseline) {try{await insertCloudTrip(trip);synced++;}catch(e){console.error('Could not insert trip',e);if(String(e.code||'')==='23505'){cloudConflicts.add(id);conflicts++;}else errors++;}continue;}
       if(canonical===baseline.canonical)continue;
-      // Read-before-write plus an updated_at compare-and-swap prevents silently overwriting a newer cloud version.
       const {data:latest,error:readError}=await supabaseClient.from('routeweaver_trips').select('updated_at').eq('trip_id',id).maybeSingle();
-      if(readError){console.error(readError);errors++;continue;}
+      if(readError){errors++;continue;}
       if(!latest||latest.updated_at!==baseline.updated_at){cloudConflicts.add(id);conflicts++;continue;}
       const payload=tripPayload(trip);
       const {data,error}=await supabaseClient.from('routeweaver_trips').update({name:payload.name,data:payload}).eq('trip_id',id).eq('updated_at',baseline.updated_at).select('trip_id,name,data,updated_at');
-      if(error){console.error(error);errors++;continue;}
+      if(error){console.error('Could not save trip',error);errors++;continue;}
       if(!data||data.length!==1){cloudConflicts.add(id);conflicts++;continue;}
       cloudMeta.set(id,{updated_at:data[0].updated_at,canonical:canonicalTrip({id,name:data[0].name,...(data[0].data||{})})});synced++;
     }
-    if(conflicts) setCloudStatus(`Sync paused for ${conflicts} trip(s) changed in the cloud. Use Refresh cloud to review; newer cloud data was not overwritten.`, 'warning');
-    else if(errors) setCloudStatus(`Sync partly completed (${synced} trip(s) synced; ${errors} error(s)). Check the browser console or connection and retry.`, 'error');
-    else setCloudStatus(synced?`Cloud sync up to date · ${new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})}`:'Cloud sync is up to date.', 'success');
+    if(conflicts)setCloudStatus(`${conflicts} trip(s) have changed in the database. Changes are paused for safety; use Refresh database to load the latest versions.`,'warning');
+    else if(errors)setCloudStatus(`Some changes could not be saved (${errors} error(s)). Check your connection, then refresh the database.`,'error');
+    else setCloudStatus(synced?`Saved to database · ${new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})}`:'All changes are saved in the database.','success');
   } finally {cloudBusy=false;setCloudUi();}
 }
-async function applyCloudRows(rows,{replace=false}={}) {
-  if(replace&&!rows.length)throw new Error('The cloud contains no trips. Refusing to replace local data with an empty cloud.');
-  const cloudTrips=rowsToTrips(rows);
-  const local=currentTrips();
-  let trips;
-  if(replace) trips=cloudTrips;
-  else {
-    const byId=new Map(local.map(t=>[String(t.id),t]));
-    for(const ct of cloudTrips)byId.set(String(ct.id),ct);
-    trips=[...byId.values()];
-  }
-  const backupKey=saveLocalBackup('before applying cloud trips');
-  const next=stateFromTrips(trips,state.activeTripId);
-  suppressCloudSchedule=true;
-  try {state=next;localStorage.setItem(STORE_KEY,JSON.stringify(state));render();}
-  finally {suppressCloudSchedule=false;}
+async function loadRowsIntoApp(rows,message='Loaded trips from the database.') {
+  const trips=rowsToTrips(rows);
+  state=stateFromTrips(trips,state?.activeTripId);
   updateMetaFromRows(rows);
   cloudSyncEnabled=true;
-  setCloudStatus(`Loaded cloud data. Local backup saved in this browser (${backupKey}).`, 'success');
-  setCloudUi();
-  if(!replace)scheduleCloudSync();
+  render();setPlannerEnabled(true);setCloudStatus(message,'success');setCloudUi();
 }
 async function bootstrapCloud() {
   if(!cloudUser||cloudBusy)return;
-  cloudBusy=true;cloudSyncEnabled=false;setCloudUi();setCloudStatus('Checking cloud trips…');
+  cloudBusy=true;cloudSyncEnabled=false;setCloudUi();setPlannerEnabled(false);setCloudStatus('Loading trips from the database…');
   try {
-    const rows=await fetchCloudRows();
-    const local=currentTrips();
+    let rows=await fetchCloudRows();
     if(!rows.length) {
-      if(!local.length){cloudSyncEnabled=true;updateMetaFromRows([]);setCloudStatus('Cloud is empty. New trips will sync automatically.','success');return;}
-      const upload=confirm(`No trips exist in the cloud yet. Upload your ${local.length} local trip(s) to Supabase now? Your local data will be kept.`);
-      if(!upload){setCloudStatus('Signed in. Cloud is empty; syncing is paused until you refresh and choose to upload.','warning');return;}
+      const initial=emptyState();
+      const trip=initial.trips[0];
+      state=initial;render();
       updateMetaFromRows([]);cloudSyncEnabled=true;
-      for(const trip of local) await insertCloudTrip(trip);
-      setCloudStatus(`Uploaded ${local.length} local trip(s). Cloud sync is enabled.`,'success');
-      return;
+      await insertCloudTrip(trip);
+      rows=await fetchCloudRows();
     }
-    const choice=prompt(`Found ${rows.length} trip(s) in the cloud and ${local.length} local trip(s). Choose one option:\n\n1 = Load cloud trips (a timestamped local backup is saved first; cloud replaces local trips).\n2 = Merge cloud trips and upload only local trips whose IDs are not already in the cloud. Existing cloud rows will not be overwritten.\n\nCancel or anything else = keep local data and leave syncing paused.`,'1');
-    if(choice==='1') {
-      await applyCloudRows(rows,{replace:true});
-    } else if(choice==='2') {
-      updateMetaFromRows(rows);
-      const remoteIds=new Set(rows.map(r=>String(r.trip_id)));
-      const localIds=new Set(local.map(t=>String(t.id)));
-      const missing=local.filter(t=>!remoteIds.has(String(t.id)));
-      const localById=new Set(local.map(t=>String(t.id)));
-      const merged=[...local,...rowsToTrips(rows).filter(t=>!localById.has(String(t.id)))];
-      const backupKey=saveLocalBackup('before merging local and cloud trips');
-      const next=stateFromTrips(merged,state.activeTripId);
-      suppressCloudSchedule=true;
-      try {state=next;localStorage.setItem(STORE_KEY,JSON.stringify(state));render();}
-      finally {suppressCloudSchedule=false;}
-      cloudSyncEnabled=true;
-      for(const trip of missing) await insertCloudTrip(trip);
-      // Existing IDs with different content are deliberately marked as conflicts rather than overwritten.
-      for(const trip of local.filter(t=>remoteIds.has(String(t.id)))) {
-        const meta=cloudMeta.get(String(trip.id));
-        if(meta&&canonicalTrip(trip)!==meta.canonical)cloudConflicts.add(String(trip.id));
-      }
-      setCloudStatus(`Merged cloud trips; uploaded ${missing.length} new local trip(s). Local backup saved (${backupKey}).${cloudConflicts.size?' Some same-ID trips differ and need Refresh cloud review.':''}`,'success');
-    } else {
-      updateMetaFromRows(rows);
-      setCloudStatus('Signed in. Local data kept; syncing is paused. Use Refresh cloud when ready to reconcile.','warning');
-    }
+    await loadRowsIntoApp(rows,`Connected to database · ${rows.length} trip${rows.length===1?'':'s'} loaded.`);
   } catch(e) {
-    console.error('Cloud setup failed',e);
-    cloudSyncEnabled=false;
-    setCloudStatus(`Cloud setup failed: ${e.message||e}. Local data has been kept. Check Supabase configuration, authentication and table policies.`, 'error');
+    console.error('Could not load trips from database',e);cloudSyncEnabled=false;setPlannerEnabled(false);
+    setCloudStatus(`Could not load trips: ${e.message||e}. Check your connection and Supabase permissions, then try Refresh database.`,'error');setCloudUi();
   } finally {cloudBusy=false;setCloudUi();}
 }
 async function refreshCloud() {
   if(!cloudUser||cloudBusy)return;
-  cloudBusy=true;setCloudUi();setCloudStatus('Refreshing cloud trips…');
+  cloudBusy=true;setCloudUi();setCloudStatus('Refreshing from the database…');
   try {
     const rows=await fetchCloudRows();
-    const local=currentTrips();
-    const previousMeta=new Map(cloudMeta);
-    if(!rows.length&&!previousMeta.size) {
-      const upload=confirm(`The cloud contains no trips. Upload your ${local.length} local trip(s)? Your local data will be kept.`);
-      if(upload) {
-        updateMetaFromRows([]);cloudSyncEnabled=true;
-        for(const trip of local)await insertCloudTrip(trip);
-        setCloudStatus(`Uploaded ${local.length} local trip(s). Cloud sync is enabled.`, 'success');
-      } else {
-        cloudSyncEnabled=false;
-        setCloudStatus('Cloud is empty. Local data was kept and syncing remains paused.', 'warning');
-      }
-      return;
+    const current=currentTrips();
+    const localChanged=current.some(t=>{const m=cloudMeta.get(String(t.id));return !m||canonicalTrip(t)!==m.canonical;});
+    const remoteChanged=rows.length!==cloudMeta.size||rows.some(r=>{const m=cloudMeta.get(String(r.trip_id));return !m||m.updated_at!==r.updated_at;});
+    if((localChanged||remoteChanged||cloudConflicts.size)&&!confirm('Reload trips from the database? Any unsaved in-memory changes in this tab will be discarded.')) {
+      setCloudStatus('Refresh cancelled. Your current in-memory changes have been kept.','warning');return;
     }
-    const remoteById=new Map(rows.map(r=>[String(r.trip_id),r]));
-    const missingRemoteIds=[...previousMeta.keys()].filter(id=>!remoteById.has(id));
-    const newRows=rows.filter(r=>!previousMeta.has(String(r.trip_id)));
-    const changedRows=rows.filter(r=>previousMeta.has(String(r.trip_id))&&previousMeta.get(String(r.trip_id)).updated_at!==r.updated_at);
-    const localDirty=local.some(t=>{const m=previousMeta.get(String(t.id));return m&&canonicalTrip(t)!==m.canonical;});
-    if(missingRemoteIds.length) {
-      for(const id of missingRemoteIds) cloudConflicts.add(id);
-      updateMetaFromRows(rows);
-      for(const id of missingRemoteIds) { const old=previousMeta.get(id); if(old)cloudMeta.set(id,old); cloudConflicts.add(id); }
-      cloudSyncEnabled=true;
-      setCloudStatus(`${missingRemoteIds.length} trip(s) known locally are missing from the cloud. Their local copies are being kept; syncing is blocked for those trips.`, 'warning');
+    if(!rows.length) {
+      if(!confirm('The database contains no trips. Create a new empty trip in the database?')){setCloudStatus('Refresh cancelled; current in-memory data remains open but is not confirmed saved.','warning');return;}
+      const initial=emptyState();state=initial;updateMetaFromRows([]);cloudSyncEnabled=true;render();
+      await insertCloudTrip(initial.trips[0]);setCloudStatus('Created a new empty trip in the database.','success');return;
     }
-    if(!cloudSyncEnabled) {
-      const choice=prompt(`Refresh found ${rows.length} cloud trip(s). Choose:\n\n1 = Load cloud trips and replace local trips (timestamped local backup first).\n2 = Merge cloud trips into local data; cloud versions replace same-ID local trips (backup first).\n\nCancel/anything else = keep local data and leave syncing paused.`,'2');
-      if(choice==='1'||choice==='2') await applyCloudRows(rows,{replace:choice==='1'});
-      else {updateMetaFromRows(rows);setCloudStatus('Cloud metadata refreshed; local data kept and syncing remains paused.','warning');}
-      return;
-    }
-    const remoteChanged=rows.some(r=>!previousMeta.has(String(r.trip_id))||previousMeta.get(String(r.trip_id)).updated_at!==r.updated_at);
-    if(missingRemoteIds.length) {
-      setCloudStatus(`${missingRemoteIds.length} cloud deletion(s) detected. Local copies are preserved and those trips will not be re-uploaded automatically.`, 'warning');
-      return;
-    }
-    if(remoteChanged) {
-      const details=`Cloud changes found (${newRows.length} new, ${changedRows.length} updated). Loading cloud versions will replace local copies with matching trip IDs. A timestamped local backup will be saved first. Continue?`;
-      if(!confirm(details)) {setCloudStatus('Cloud changes detected; local data kept. Sync is paused for safety.','warning');cloudSyncEnabled=false;for(const row of rows)if(!previousMeta.has(String(row.trip_id))||previousMeta.get(String(row.trip_id)).updated_at!==row.updated_at)cloudConflicts.add(String(row.trip_id));return;}
-      await applyCloudRows(rows,{replace:false});
-    } else if(cloudConflicts.size) {
-      const choice=prompt(`There are ${cloudConflicts.size} trip conflict(s). Choose how to resolve them:\n\n1 = Load cloud versions for matching trips (timestamped local backup first).\n2 = Keep local versions and upload them only if the cloud has not changed since the last check.\n\nCancel or anything else = leave syncing paused for safety.`,'1');
-      if(choice==='1') await applyCloudRows(rows,{replace:false});
-      else if(choice==='2') {
-        updateMetaFromRows(rows);cloudSyncEnabled=true;cloudBusy=false;setCloudUi();
-        await syncLocalChanges();
-      } else {cloudSyncEnabled=false;setCloudStatus('Conflicts remain unresolved; cloud syncing is paused.','warning');}
-      return;
-    } else {
-      updateMetaFromRows(rows);
-      cloudSyncEnabled=true;
-      cloudBusy=false;setCloudUi();
-      await syncLocalChanges();
-      if(!localDirty)setCloudStatus('Cloud refreshed; no remote changes found.','success');
-    }
-  } catch(e) {
-    console.error('Cloud refresh failed',e);setCloudStatus(`Refresh failed: ${e.message||e}. Local data has been kept.`,'error');
-  } finally {cloudBusy=false;setCloudUi();}
+    await loadRowsIntoApp(rows,`Refreshed from database · ${rows.length} trip${rows.length===1?'':'s'} loaded.`);
+  } catch(e) {console.error('Database refresh failed',e);setCloudStatus(`Refresh failed: ${e.message||e}. Your current in-memory data has been kept.`,'error');}
+  finally {cloudBusy=false;setCloudUi();}
 }
 async function initCloud() {
-  const url=window.SUPABASE_URL;
-  const key=window.SUPABASE_ANON_KEY;
+  const url=window.SUPABASE_URL,key=window.SUPABASE_ANON_KEY;
   if(!window.supabase||!url||!key||String(url).includes('YOUR_')||String(key).includes('YOUR_')) {
-    $('cloudSignInBtn').disabled=true;$('cloudRefreshBtn').disabled=true;
-    setCloudStatus('Cloud sync is not configured. Check config.js contains window.SUPABASE_URL and window.SUPABASE_ANON_KEY.');setCloudUi();return;
+    $('cloudSignInBtn').disabled=true;$('cloudRefreshBtn').disabled=true;setPlannerEnabled(false);
+    setCloudStatus('Database connection is not configured. Check config.js contains window.SUPABASE_URL and window.SUPABASE_ANON_KEY.','error');setCloudUi();return;
   }
-  try {supabaseClient=window.supabase.createClient(url,key);} catch(e) {setCloudStatus('Could not initialise Supabase: '+e.message,'error');return;}
+  supabaseClient=window.supabase.createClient(url,key);
   $('cloudSignInBtn').addEventListener('click',async()=>{
-    const email=$('cloudEmail').value.trim();
-    if(!email){alert('Enter your email address first.');return;}
+    const email=$('cloudEmail').value.trim();if(!email){alert('Enter your email address first.');return;}
     cloudBusy=true;setCloudUi();setCloudStatus('Sending sign-in link…');
-    try {
-      const redirect=window.location.origin+window.location.pathname;
-      const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirect}});
-      if(error)throw error;
-      setCloudStatus('Sign-in link sent. Open the email on this device/browser to finish signing in.','success');
-    } catch(e) {setCloudStatus('Could not send sign-in link: '+(e.message||e),'error');}
-    finally {cloudBusy=false;setCloudUi();}
+    try {const redirect=window.location.origin+window.location.pathname;const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirect}});if(error)throw error;setCloudStatus('Sign-in link sent. Open the email on this device/browser to finish signing in.','success');}
+    catch(e){setCloudStatus('Could not send sign-in link: '+(e.message||e),'error');}
+    finally{cloudBusy=false;setCloudUi();}
   });
   $('cloudSignOutBtn').addEventListener('click',async()=>{
-    if(!confirm('Sign out of RouteWeaver cloud sync on this browser? Local trips will remain saved.'))return;
-    cloudSyncEnabled=false;cloudUser=null;authUserId=null;cloudMeta.clear();cloudConflicts.clear();
+    if(!confirm('Sign out? Any changes not yet saved to the database will be lost.'))return;
+    cloudSyncEnabled=false;cloudUser=null;authUserId=null;cloudMeta.clear();cloudConflicts.clear();clearTimeout(cloudTimer);
     const {error}=await supabaseClient.auth.signOut();
-    if(error)setCloudStatus('Signed out locally, but Supabase reported: '+error.message,'warning');
-    else setCloudStatus('Signed out. Your local trips remain available on this device.');
-    setCloudUi();
+    state=emptyState();render();document.querySelectorAll('.modal-backdrop.open').forEach(m=>m.classList.remove('open'));setPlannerEnabled(false);
+    setCloudStatus(error?'Signed out locally; Supabase reported: '+error.message:'Signed out. Sign in to load your trips from the database.',error?'warning':'info');setCloudUi();
   });
   $('cloudRefreshBtn').addEventListener('click',refreshCloud);
   supabaseClient.auth.onAuthStateChange((event,session)=>{
-    // Defer Supabase data calls outside the auth callback to avoid locking the auth client.
     setTimeout(async()=>{
-      const nextUser=session?.user||null;
-      const nextId=nextUser?.id||null;
-      if(nextId===authUserId)return; // Ignore duplicate INITIAL_SESSION notifications.
+      const nextUser=session?.user||null,nextId=nextUser?.id||null;
+      if(nextId===authUserId)return;
       authUserId=nextId;cloudUser=nextUser;
-      if(cloudUser) await bootstrapCloud();
-      else {cloudSyncEnabled=false;cloudMeta.clear();cloudConflicts.clear();setCloudStatus('Not signed in. Local trips remain saved on this device.');setCloudUi();}
+      if(cloudUser)await bootstrapCloud();
+      else {cloudSyncEnabled=false;cloudMeta.clear();cloudConflicts.clear();clearTimeout(cloudTimer);state=emptyState();render();setPlannerEnabled(false);setCloudStatus('Not signed in. Sign in to load trips from the database.');setCloudUi();}
     },0);
   });
-  const {data:{session},error}=await supabaseClient.auth.getSession();
-  if(error)throw error;
+  const {data:{session},error}=await supabaseClient.auth.getSession();if(error)throw error;
   cloudUser=session?.user||null;authUserId=cloudUser?.id||null;
   if(cloudUser)await bootstrapCloud();
-  else {setCloudStatus('Not signed in. Local trips remain saved on this device.');setCloudUi();}
+  else {state=emptyState();render();setPlannerEnabled(false);setCloudStatus('Not signed in. Sign in to load trips from the database.');setCloudUi();}
 }
-
-state=load();render();
-$('tripSelect').addEventListener('change',e=>switchTrip(e.target.value));$('addTripBtn').addEventListener('click',addTrip);$('editTripBtn').addEventListener('click',openTripEditor);$('tripEditForm').addEventListener('submit',e=>{e.preventDefault();renameTripFromEditor()});$('deleteTripFromEditorBtn').addEventListener('click',deleteTripFromEditor);
+state=emptyState();render();setPlannerEnabled(false);
+$('tripSelect').addEventListener('change',e=>switchTrip(e.target.value));$('addTripBtn').addEventListener('click',addTrip);$('editTripBtn').addEventListener('click',openTripEditor);$('tripEditForm').addEventListener('submit',e=>{e.preventDefault();if(cloudSyncEnabled)renameTripFromEditor()});$('deleteTripFromEditorBtn').addEventListener('click',deleteTripFromEditor);
 $('addFlightBtn').addEventListener('click',()=>openFlight());$('addRouteBtn').addEventListener('click',()=>openRoute());$('copyTripBtn').addEventListener('click',copyTripJSON);$('editRouteBtn').addEventListener('click',()=>state.selectedRoute&&openRoute(state.selectedRoute));$('exportBtn').addEventListener('click',exportJSON);$('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value=''});
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));document.querySelectorAll('.modal-backdrop').forEach(back=>back.addEventListener('click',e=>{if(e.target===back)back.classList.remove('open')}));
-document.addEventListener('click',e=>{const routeUp=e.target.closest('[data-route-up]');if(routeUp){e.stopPropagation();const i=Number(routeUp.dataset.routeUp);if(i>0){[state.routes[i-1],state.routes[i]]=[state.routes[i],state.routes[i-1]];save();renderRoutes();}return}const routeDown=e.target.closest('[data-route-down]');if(routeDown){e.stopPropagation();const i=Number(routeDown.dataset.routeDown);if(i<state.routes.length-1){[state.routes[i+1],state.routes[i]]=[state.routes[i],state.routes[i+1]];save();renderRoutes();}return}const dup=e.target.closest('[data-duplicate-flight]');if(dup){e.stopPropagation();openFlight('',flight(dup.dataset.duplicateFlight));return}const edit=e.target.closest('[data-edit-flight]');if(edit){e.stopPropagation();openFlight(edit.dataset.editFlight);return}const node=e.target.closest('[data-flight]');if(node){openFlight(node.dataset.flight);return}const routeItem=e.target.closest('[data-select-route]');if(routeItem){state.selectedRoute=routeItem.dataset.selectRoute;save();render();return}const up=e.target.closest('[data-seq-up]');if(up){const i=Number(up.dataset.seqUp);if(i>0){[editSequence[i-1],editSequence[i]]=[editSequence[i],editSequence[i-1]];renderSequence()}return}const down=e.target.closest('[data-seq-down]');if(down){const i=Number(down.dataset.seqDown);if(i<editSequence.length-1){[editSequence[i+1],editSequence[i]]=[editSequence[i],editSequence[i+1]];renderSequence()}return}const rem=e.target.closest('[data-seq-remove]');if(rem){editSequence=editSequence.filter(id=>id!==rem.dataset.seqRemove);renderSequence()}});
-document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.flight-card')){e.preventDefault();openFlight(e.target.dataset.flight)}if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(x=>x.classList.remove('open'))});
+document.addEventListener('click',e=>{if(!cloudSyncEnabled)return;const routeUp=e.target.closest('[data-route-up]');if(routeUp){e.stopPropagation();const i=Number(routeUp.dataset.routeUp);if(i>0){[state.routes[i-1],state.routes[i]]=[state.routes[i],state.routes[i-1]];save();renderRoutes();}return}const routeDown=e.target.closest('[data-route-down]');if(routeDown){e.stopPropagation();const i=Number(routeDown.dataset.routeDown);if(i<state.routes.length-1){[state.routes[i+1],state.routes[i]]=[state.routes[i],state.routes[i+1]];save();renderRoutes();}return}const dup=e.target.closest('[data-duplicate-flight]');if(dup){e.stopPropagation();openFlight('',flight(dup.dataset.duplicateFlight));return}const edit=e.target.closest('[data-edit-flight]');if(edit){e.stopPropagation();openFlight(edit.dataset.editFlight);return}const node=e.target.closest('[data-flight]');if(node){openFlight(node.dataset.flight);return}const routeItem=e.target.closest('[data-select-route]');if(routeItem){state.selectedRoute=routeItem.dataset.selectRoute;save();render();return}const up=e.target.closest('[data-seq-up]');if(up){const i=Number(up.dataset.seqUp);if(i>0){[editSequence[i-1],editSequence[i]]=[editSequence[i],editSequence[i-1]];renderSequence()}return}const down=e.target.closest('[data-seq-down]');if(down){const i=Number(down.dataset.seqDown);if(i<editSequence.length-1){[editSequence[i+1],editSequence[i]]=[editSequence[i],editSequence[i+1]];renderSequence()}return}const rem=e.target.closest('[data-seq-remove]');if(rem){editSequence=editSequence.filter(id=>id!==rem.dataset.seqRemove);renderSequence()}});
+document.addEventListener('keydown',e=>{if(!cloudSyncEnabled)return;if((e.key==='Enter'||e.key===' ')&&e.target.matches('.flight-card')){e.preventDefault();openFlight(e.target.dataset.flight)}if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(x=>x.classList.remove('open'))});
 $('addToSequenceBtn').addEventListener('click',()=>{const id=$('flightPicker').value;if(id&&!editSequence.includes(id)){editSequence.push(id);renderSequence()}});
-$('flightForm').addEventListener('submit',e=>{e.preventDefault();const id=$('flightId').value||uid('f');const f={id,origin:$('origin').value.trim().toUpperCase(),destination:$('destination').value.trim().toUpperCase(),flightNumber:$('flightNumber').value.trim().toUpperCase(),aircraftType:$('aircraftType').value.trim().toUpperCase(),cabinClass:$('cabinClass').value,departAt:$('departDate').value+'T'+$('departTime').value,arriveAt:$('arriveDate').value+'T'+$('arriveTime').value,type:$('flightType').value,cost:Math.max(0,Number($('cost').value)||0),buffer:Math.max(0,Number($('buffer').value)||0),availability:$('availability').value,notes:$('flightNotes').value.trim(),locked:$('locked').checked};if(new Date(f.arriveAt)<new Date(f.departAt)){alert('Arrival must be after departure.');return}const idx=state.flights.findIndex(x=>x.id===id);if(idx>=0)state.flights[idx]=f;else state.flights.push(f);save();render();closeModal('flightModal')});$('deleteFlightBtn').addEventListener('click',()=>removeFlight($('flightId').value));
-$('routeForm').addEventListener('submit',e=>{e.preventDefault();const id=$('routeId').value||uid('r');const r={id,name:$('routeName').value.trim(),notes:$('routeNotes').value.trim(),flightIds:[...editSequence],preferred:$('routePreferred').checked,whatIf:$('routeUnavailable').checked};if(!r.name){alert('Please give this route a name.');return}const existing=state.routes.findIndex(x=>x.id===id);if(existing>=0)state.routes[existing]=r;else state.routes.push(r);if(r.preferred)state.routes.forEach(x=>{if(x.id!==id)x.preferred=false});else if(!state.routes.some(x=>x.preferred))r.preferred=true;state.selectedRoute=id;save();render();closeModal('routeModal')});$('deleteRouteBtn').addEventListener('click',()=>removeRoute($('routeId').value));
+$('flightForm').addEventListener('submit',e=>{e.preventDefault();if(!cloudSyncEnabled)return;const id=$('flightId').value||uid('f');const f={id,origin:$('origin').value.trim().toUpperCase(),destination:$('destination').value.trim().toUpperCase(),flightNumber:$('flightNumber').value.trim().toUpperCase(),aircraftType:$('aircraftType').value.trim().toUpperCase(),cabinClass:$('cabinClass').value,departAt:$('departDate').value+'T'+$('departTime').value,arriveAt:$('arriveDate').value+'T'+$('arriveTime').value,type:$('flightType').value,cost:Math.max(0,Number($('cost').value)||0),buffer:Math.max(0,Number($('buffer').value)||0),availability:$('availability').value,notes:$('flightNotes').value.trim(),locked:$('locked').checked};if(new Date(f.arriveAt)<new Date(f.departAt)){alert('Arrival must be after departure.');return}const idx=state.flights.findIndex(x=>x.id===id);if(idx>=0)state.flights[idx]=f;else state.flights.push(f);save();render();closeModal('flightModal')});$('deleteFlightBtn').addEventListener('click',()=>removeFlight($('flightId').value));
+$('routeForm').addEventListener('submit',e=>{e.preventDefault();if(!cloudSyncEnabled)return;const id=$('routeId').value||uid('r');const r={id,name:$('routeName').value.trim(),notes:$('routeNotes').value.trim(),flightIds:[...editSequence],preferred:$('routePreferred').checked,whatIf:$('routeUnavailable').checked};if(!r.name){alert('Please give this route a name.');return}const existing=state.routes.findIndex(x=>x.id===id);if(existing>=0)state.routes[existing]=r;else state.routes.push(r);if(r.preferred)state.routes.forEach(x=>{if(x.id!==id)x.preferred=false});else if(!state.routes.some(x=>x.preferred))r.preferred=true;state.selectedRoute=id;save();render();closeModal('routeModal')});$('deleteRouteBtn').addEventListener('click',()=>removeRoute($('routeId').value));
 window.addEventListener('resize',()=>renderGraph());
 initCloud().catch(e=>{console.error('Cloud initialisation failed',e);setCloudStatus('Cloud initialisation failed: '+(e.message||e),'error');});
 })();
